@@ -1,8 +1,8 @@
 Project Title: DrugWeb
 Overview
 
-DrugWeb is an online pharmacy and medicine-delivery management system designed to simplify medicine purchasing, stock tracking, payments, and delivery handling.
-The system provides three distinct user roles—Admin, Customer, and Deliveryman—each supported by a well-structured database model shown in the ER/EER diagrams.
+DrugWeb is an online pharmacy and medicine delivery management system designed to simplify medicine purchasing, stock tracking, payments, and delivery handling.
+The system provides three distinct user roles, which are Admin, Customer, and Deliveryman. Each supported by a well-structured database model shown in the ER/EER diagrams.
 
 The main PDF diagrams illustrate a system that handles medicines, carts, payments, requests, reviews, notifications, and delivery assignment in a relational, fully normalized model.
 
@@ -99,7 +99,7 @@ Customer ID
 
 4. Proceed to Payment
 
-Choose between:
+User can choose between:
 
 Online Payment
 
@@ -159,3 +159,4 @@ Admin assigns a deliveryman → deliveryman accepts
 Customer receives delivery → leaves a review
 
 Admin monitors stock, payments, deliveries, reviews, and medicine requests
+
