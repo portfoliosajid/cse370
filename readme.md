@@ -1,58 +1,161 @@
-**Project Title: DrugWeb**
+Project Title: DrugWeb
+Overview
 
-**Overview**
+DrugWeb is an online pharmacy and medicine-delivery management system designed to simplify medicine purchasing, stock tracking, payments, and delivery handling.
+The system provides three distinct user roles—Admin, Customer, and Deliveryman—each supported by a well-structured database model shown in the ER/EER diagrams.
 
+The main PDF diagrams illustrate a system that handles medicines, carts, payments, requests, reviews, notifications, and delivery assignment in a relational, fully normalized model.
 
+Key Features
+Admin Panel
+1. Medicine & Stock Management
 
-**DrugWeb is an online pharmacy management system designed to streamline the process of purchasing medicines, managing stock, and handling deliveries. The system provides separate interfaces for administrators and customers, ensuring efficient operations, transparency, and user convenience.**
+Admin manages all medicines using attributes such as Med_Code, Generic_Name, Name, Price, and Stock.
 
+Can update stock quantities and track availability in real time.
 
+2. User & Deliveryman Management
 
-**Key Features**
+Admin can manage Customers and Deliverymen, each identified with unique IDs and profile information.
 
-**Admin Panel**
+3. Cart & Order Monitoring
 
+Admin can view all customer carts through relationships:
 
+Each cart links to Customer ID, Medicine Code, and Quantity.
 
-**Payment Management:**
+Helps monitor orders before payment and delivery processing.
 
-**Allows the admin to manage and verify customer payments securely.**
+4. Payment Handling
 
+Payments are linked to:
 
+Payment_ID
 
-**Deliveryman Assignment:**
+Payment_Type (Online / COD)
 
-**Enables the admin to assign delivery personnel to specific customer orders.**
+Amount
 
+Cart_ID
 
+Deliveryman_ID
 
-**Admin Dashboard:**
+Admin verifies payments and ensures proper linking with delivery tasks.
 
-**A centralized dashboard providing insights and controls for:**
+5. Deliveryman Assignment
 
+Admin assigns deliverymen to orders through the accept relationship table.
 
+Assignment includes customer, deliveryman, payment, and date details.
 
-**Stock Management: Track and update available medicines.**
+6. Notification System
 
+The notification entity links Customer, Medicine, and Cart for alerts like:
 
+“Item added to cart”
 
-**Cart Workflow: Monitor the status of customer orders and carts.**
+“Stock updated”
 
+“Order status update”
 
+7. Review Management
 
-**Notifications: Manage system alerts and user notifications.**
+Admin can monitor customer reviews through the review table.
 
+Reviews are connected to customers and optionally medicines.
 
+8. Customer Request Handling
 
-**Customer Reviews: View and respond to customer feedback.**
+Customers can request unavailable medicines through the customer_request entity.
 
+Each request includes:
 
+Request ID
 
-**Customer Portal**
+Medicine Name
 
+Expected Date
 
+Customer Portal
+1. Account Management
 
-**Proceed to Payment:**
+Customer has unique profile fields including ID, Name, Email, Address, Phone, etc.
 
-**Customers can easily review their cart and complete payments through a secure checkout process.**
+2. Search & Browse Medicines
 
+View medicine list (Name, Generic Name, Unit Price, Stock levels).
+
+3. Add to Cart
+
+Carts include:
+
+Cart_ID
+
+Medicine Code
+
+Quantity
+
+Customer ID
+
+4. Proceed to Payment
+
+Choose between:
+
+Online Payment
+
+Cash on Delivery
+
+Successful payments are logged in the payment entity.
+
+5. Track Delivery
+
+Delivery status managed via the accept table:
+
+Deliveryman ID
+
+Payment ID
+
+Acceptance Date
+
+6. Write Reviews
+
+Customers can leave reviews for medicine/service using review entity.
+
+7. Request Unavailable Medicines
+
+Submit special requests using customer_request:
+
+Requested medicine name
+
+Expected need date
+
+Deliveryman Panel
+1. Assigned Orders
+
+Deliveryman receives an order assigned by admin.
+
+Each assigned order includes:
+
+Customer ID
+
+Payment ID
+
+Date
+
+Delivery acceptance
+
+2. Delivery Status Updates
+
+Deliveryman confirms acceptance and completion of deliveries.
+
+Overall System Workflow (Based on PDF ER/EER)
+
+Customer registers → browses medicines → adds items to cart
+
+Customer proceeds to payment → system records payment
+
+Admin assigns a deliveryman → deliveryman accepts
+
+Customer receives delivery → leaves a review
+
+Admin monitors stock, payments, deliveries, reviews, and medicine requests
