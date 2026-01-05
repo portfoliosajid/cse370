@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard - DrugWeb</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; }
+        
+        /* Navbar */
+        .navbar {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .navbar .logo { font-size: 24px; font-weight: bold; color: #28a745; text-decoration: none; }
+        .nav-links a { margin-left: 20px; text-decoration: none; color: #555; font-weight: 500; }
+        .nav-links a:hover { color: #28a745; }
+        .nav-links .btn-logout { color: #dc3545; }
+
+        /* Dashboard Container */
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+
+        /* Stats & Header */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .points-badge {
+            background: #e6ffed;
+            color: #28a745;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            border: 1px solid #28a745;
+        }
+
+        /* Search & Filter Bar */
+        .toolbar {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .search-box { flex-grow: 1; display: flex; gap: 10px; }
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .filter-box select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: white; }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-primary:hover { background: #0056b3; }
+
+        /* Medicine Grid */
+        .medicine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .medicine-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .medicine-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .med-category { color: #888; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.5px; }
+        .med-name { margin: 10px 0 5px 0; font-size: 1.2em; color: #333; }
+        .med-generic { color: #666; font-size: 0.9em; font-style: italic; margin-bottom: 15px; }
+        .med-price { font-size: 1.4em; color: #28a745; font-weight: bold; margin-bottom: 15px; }
+        
+        .stock-status { font-size: 0.85em; margin-bottom: 15px; }
+        .in-stock { color: #28a745; }
+        .low-stock { color: #ffc107; }
+        .out-stock { color: #dc3545; }
+
+        .btn-add-cart {
+            background: #28a745;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .btn-add-cart:hover { background: #218838; }
+        .btn-add-cart:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* Request Medicine Section */
+        .request-section {
+            margin-top: 50px;
+            text-align: center;
+            padding: 40px;
+            background: #fff;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/customer/dashboard" class="logo">DrugWeb 💊</a>
+        <div class="nav-links">
+            <a href="/customer/dashboard">Shop</a>
+            <a href="/customer/browse">Browse</a>
+            <a href="/customer/cart">Cart</a>
+            <a href="/customer/reviews">Reviews</a>
+            <a href="/customer/request_medicine">Request Med</a>
+            <a href="/customer/notifications">Notifications</a>
+            <a href="/customer/profile">My Profile</a>
+            <a href="/logout" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header-section">
+            <h1>Welcome Back, {{ session.user_name }}</h1>
+            <a href="/customer/points" style="text-decoration: none;">
+                <div class="points-badge" style="cursor: pointer; transition: transform 0.2s;">
+                    <i class="fas fa-star"></i> {{ customer_points }} Loyalty Points
+                </div>
+            </a>
+        </div>
+
+        <form action="/customer/dashboard" method="GET" class="toolbar">
+            <div class="search-box">
+                <input type="text" name="search" placeholder="Search medicines by name or generic name..." value="{{ search }}">
+                <button type="submit" class="btn-primary">Search</button>
+            </div>
+            
+            <div class="filter-box">
+                <select name="sort_by" onchange="this.form.submit()">
+                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Sort by Name (A-Z)</option>
+                    <option value="price" {% if sort_by == 'price' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                </select>
+            </div>
+            
+            {% if search or sort_by != 'name' %}
+            <a href="/customer/dashboard" style="align-self: center; color: #dc3545; text-decoration: none;">Clear Filters</a>
+            {% endif %}
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="padding: 10px; margin-bottom: 20px; border-radius: 5px; 
+                        background: {% if category=='error' %}#ffe6e6{% else %}#e6ffed{% endif %}; 
+                        color: {% if category=='error' %}#dc3545{% else %}#28a745{% endif %};">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="medicine-grid">
+            {% for med in medicines %}
+            <div class="medicine-card">
+                <div>
+                    <div class="med-category">{{ med.Category or 'General' }}</div>
+                    <h3 class="med-name">{{ med.Name }}</h3>
+                    <div class="med-generic">{{ med.Generic_name }}</div>
+                    <div class="med-price">৳{{ med.Price }}</div>
+                    
+                    <div class="stock-status {% if med.Stock == 0 %}out-stock{% elif med.Stock < 10 %}low-stock{% else %}in-stock{% endif %}">
+                        {% if med.Stock == 0 %}
+                            <i class="fas fa-times-circle"></i> Out of Stock
+                        {% elif med.Stock < 10 %}
+                            <i class="fas fa-exclamation-circle"></i> Low Stock: Only {{ med.Stock }} left
+                        {% else %}
+                            <i class="fas fa-check-circle"></i> In Stock
+                        {% endif %}
+                    </div>
+                </div>
+
+                <button onclick="addToCart('{{ med.Med_Code }}', '{{ med.Name }}', {{ med.Price }})" 
+                        class="btn-add-cart" 
+                        {% if med.Stock == 0 %}disabled{% endif %}>
+                    {% if med.Stock == 0 %}Unavailable{% else %}Add to Cart <i class="fas fa-cart-plus"></i>{% endif %}
+                </button>
+            </div>
+            {% else %}
+            <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #666;">
+                <h3>No medicines found matching your search.</h3>
+                <p>Try checking your spelling or request the medicine below.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="request-section">
+            <h2>Can't find what you're looking for?</h2>
+            <p>You can request a specific medicine and we will try to stock it for you.</p>
+            <a href="/customer/request_medicine" class="btn-primary" style="text-decoration: none; display: inline-block; margin-top: 10px;">Request Medicine</a>
+        </div>
+    </div>
+
+<script>
+        function addToCart(code, name, price) {
+            fetch('/customer/add_to_cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    med_code: code,
+                    med_name: name,
+                    quantity: 1,
+                    price: price 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    // Show a confirmation dialog
+                    if (confirm("✅ " + name + " added to cart!\n\nDo you want to go to the Cart now?\n(Click 'Cancel' to stay here and add more items)")) {
+                        // User clicked OK -> Go to Cart
+                        window.location.href = "/customer/cart";
+                    } else {
+                        // User clicked Cancel -> Stay on page (Do nothing)
+                    }
+                } else {
+                    alert('❌ Error: ' + data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+
+</body>
+</html>

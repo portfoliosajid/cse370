@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Medicine - DrugWeb</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; }
+        
+        /* Navbar */
+        .navbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .logo { color: #28a745; font-size: 24px; font-weight: bold; text-decoration: none; }
+        .nav-links a { margin-left: 20px; color: #555; text-decoration: none; font-weight: 500; }
+        .nav-links .active { color: #28a745; }
+        .btn-logout { color: #dc3545 !important; }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        /* Request Form Card */
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .card h2 { margin-top: 0; color: #333; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #666; font-weight: 500; }
+        input[type="text"], input[type="date"] {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 16px;
+        }
+        input:focus { border-color: #28a745; outline: none; }
+
+        .btn-submit {
+            background: #28a745; color: white; border: none; padding: 12px 25px;
+            border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;
+            transition: background 0.3s; width: 100%;
+        }
+        .btn-submit:hover { background: #218838; }
+
+        /* Request History Table */
+        .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .history-table th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; color: #888; font-size: 0.9em; }
+        .history-table td { padding: 15px 12px; border-bottom: 1px solid #eee; }
+        .history-table tr:last-child td { border-bottom: none; }
+
+        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.85em; font-weight: bold; }
+        .status-Pending { background: #fff3cd; color: #856404; }
+        .status-Accepted { background: #d4edda; color: #155724; }
+        .status-Declined { background: #f8d7da; color: #721c24; }
+
+        .alert-success { background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .alert-error { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        
+        .empty-state { text-align: center; color: #999; padding: 30px; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/customer/dashboard" class="logo">DrugWeb 💊</a>
+        <div class="nav-links">
+            <a href="/customer/dashboard">Shop</a>
+            <a href="/customer/browse">Browse</a>
+            <a href="/customer/cart">Cart</a>
+            <a href="/customer/reviews">Reviews</a>
+            <a href="/customer/request_medicine">Request Med</a>
+            <a href="/customer/notifications">Notifications</a>
+            <a href="/customer/profile">My Profile</a>
+            <a href="/logout" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card">
+            <h2><i class="fas fa-prescription-bottle-alt"></i> Request a Medicine</h2>
+            <p style="color: #666; margin-bottom: 20px;">Can't find a medicine? Request it here and we'll try to stock it for you.</p>
+            
+            <form action="/customer/request_medicine" method="POST">
+                <div class="form-group">
+                    <label>Medicine Name</label>
+                    <input type="text" name="medicine_name" placeholder="E.g., Napa Extend, Seclo 20" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Expected Date Needed</label>
+                    <input type="date" name="expected_date" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Submit Request</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Your Request History</h2>
+            
+            {% if requests %}
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Medicine Name</th>
+                        <th>Expected Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests %}
+                    <tr>
+                        <td style="font-weight: 500; color: #333;">{{ req.request_med_name }}</td>
+                        <td style="color: #666;">{{ req.Expected_date }}</td>
+                        <td>
+                            <span class="status-badge status-{{ req.Status }}">
+                                {{ req.Status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                You haven't made any requests yet.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>

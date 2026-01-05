@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Setup - DrugWeb</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .success-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 550px;
+            width: 90%;
+            border-top: 5px solid #28a745;
+        }
+
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            background-color: #e6ffed;
+            color: #28a745;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            margin: 0 auto 20px auto;
+        }
+
+        h1 { color: #333; margin-bottom: 10px; }
+        p { color: #666; margin-bottom: 30px; }
+
+        .credentials-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .cred-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .cred-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        .role { font-weight: bold; color: #333; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .cred-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: monospace;
+            font-size: 1.1em;
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .email { color: #0056b3; font-weight: bold; }
+        .pass { color: #555; }
+        .divider { color: #ccc; }
+
+        /* Copy Button Styling */
+        .copy-btn {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.2s;
+            font-size: 0.9em;
+        }
+        .copy-btn:hover { color: #007bff; }
+        .copy-btn.copied { color: #28a745; }
+
+        .btn {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            transition: background 0.3s;
+            box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);
+        }
+        .btn:hover { background-color: #218838; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+    <div class="success-card">
+        <div class="icon-circle">
+            <i class="fas fa-check"></i>
+        </div>
+        <h1>Setup Complete!</h1>
+        <p>Database created. Use these credentials to log in:</p>
+
+        <div class="credentials-box">
+            <div class="cred-item">
+                <span class="role">Customer</span>
+                <div class="cred-row">
+                    <span class="email">customer@test.com</span>
+                    <button class="copy-btn" onclick="copyToClipboard('customer@test.com', this)" title="Copy Email"><i class="fas fa-copy"></i></button>
+                    <span class="divider">|</span>
+                    <span class="pass">password123</span>
+                    <button class="copy-btn" onclick="copyToClipboard('password123', this)" title="Copy Password"><i class="fas fa-copy"></i></button>
+                </div>
+            </div>
+
+            <div class="cred-item">
+                <span class="role">Admin</span>
+                <div class="cred-row">
+                    <span class="email">admin@test.com</span>
+                    <button class="copy-btn" onclick="copyToClipboard('admin@test.com', this)" title="Copy Email"><i class="fas fa-copy"></i></button>
+                    <span class="divider">|</span>
+                    <span class="pass">admin123</span>
+                    <button class="copy-btn" onclick="copyToClipboard('admin123', this)" title="Copy Password"><i class="fas fa-copy"></i></button>
+                </div>
+            </div>
+
+            <div class="cred-item">
+                <span class="role">Delivery Man</span>
+                <div class="cred-row">
+                    <span class="email">delivery@test.com</span>
+                    <button class="copy-btn" onclick="copyToClipboard('delivery@test.com', this)" title="Copy Email"><i class="fas fa-copy"></i></button>
+                    <span class="divider">|</span>
+                    <span class="pass">delivery123</span>
+                    <button class="copy-btn" onclick="copyToClipboard('delivery123', this)" title="Copy Password"><i class="fas fa-copy"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <a href="/login" class="btn">Go to Login Page</a>
+    </div>
+
+    <script>
+        function copyToClipboard(text, btnElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Visual feedback
+                const icon = btnElement.querySelector('i');
+                const originalClass = icon.className;
+                
+                // Change icon to checkmark
+                icon.className = 'fas fa-check';
+                btnElement.classList.add('copied');
+                
+                // Reset after 1.5 seconds
+                setTimeout(() => {
+                    icon.className = originalClass;
+                    btnElement.classList.remove('copied');
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    </script>
+
+</body>
+</html>

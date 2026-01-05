@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard - DrugWeb</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 20px; background: #f4f4f4; }
+        .header { background: #333; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .container { max-width: 1200px; margin: 20px auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .section { margin-bottom: 40px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
+        h2 { color: #2c3e50; }
+        .btn { padding: 5px 10px; text-decoration: none; color: white; border-radius: 4px; }
+        .btn-green { background: #28a745; }
+        .btn-red { background: #dc3545; }
+        .btn-blue { background: #007bff; }
+        .logout { color: #ff6b6b; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Admin Dashboard</h1>
+        <div>
+            <span>Welcome, Admin</span> | 
+            <a href="/admin/profile" style="color: #ddd; text-decoration: none; margin-right: 10px;">Profile</a> | 
+            <a href="/logout" class="logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h2>💊 Medicine Inventory</h2>
+            <table>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Generic Name</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                </tr>
+                {% for med in medicines %}
+                <tr>
+                    <td>{{ med.Med_Code }}</td>
+                    <td>{{ med.Name }}</td>
+                    <td>{{ med.Generic_name }}</td>
+                    <td>৳{{ med.Price }}</td>
+                    <td>{{ med.Stock }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">No medicines found.</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>📝 Medicine Requests</h2>
+            <table>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Medicine Requested</th>
+                    <th>Expected Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                {% for req in requests %}
+                <tr>
+                    <td>{{ req.customer_name }}</td>
+                    <td>{{ req.request_med_name }}</td>
+                    <td>{{ req.Expected_date }}</td>
+                    <td>{{ req.Status }}</td>
+                    <td>
+                        {% if req.Status == 'Pending' %}
+                        <button onclick="handleRequest('{{ req.Customer_ID }}', '{{ req.request_med_name }}', 'accept')" class="btn btn-green">Accept</button>
+                        <button onclick="handleRequest('{{ req.Customer_ID }}', '{{ req.request_med_name }}', 'decline')" class="btn btn-red">Decline</button>
+                        {% else %}
+                        {{ req.Status }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">No pending requests.</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>⭐ Customer Reviews</h2>
+            <table>
+                <tr>
+                    <th>Customer</th>
+                    <th>Review</th>
+                </tr>
+                {% for review in reviews %}
+                <tr>
+                    <td>{{ review.customer_name }}</td>
+                    <td>{{ review.review }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="2">No reviews yet.</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="/admin/payments" class="btn btn-blue" style="padding: 15px;">View All Payments</a>
+        </div>
+    </div>
+
+    <script>
+        function handleRequest(custId, medName, action) {
+            fetch('/admin/handle_request', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ customer_id: custId, medicine_name: medName, action: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>

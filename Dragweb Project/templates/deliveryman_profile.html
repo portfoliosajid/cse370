@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Profile - DrugWeb</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; }
+        
+        /* Navbar */
+        .navbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .logo { color: #28a745; font-size: 24px; font-weight: bold; text-decoration: none; }
+        .nav-links a { margin-left: 20px; color: #555; text-decoration: none; font-weight: 500; }
+        .nav-links a:hover { color: #28a745; }
+        
+        .container { max-width: 600px; margin: 50px auto; padding: 0 20px; }
+        
+        .card { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; }
+        .avatar { width: 100px; height: 100px; background: #e9ecef; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #17a2b8; }
+        
+        h2 { margin: 10px 0 30px; color: #333; }
+        
+        .info-group { text-align: left; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .label { font-weight: bold; color: #666; display: block; font-size: 0.9em; margin-bottom: 5px; }
+        .value { color: #333; font-size: 1.1em; }
+        
+        .btn-back { display: inline-block; margin-top: 20px; padding: 10px 25px; background: #333; color: white; text-decoration: none; border-radius: 5px; transition: background 0.3s; }
+        .btn-back:hover { background: #555; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/deliveryman/dashboard" class="logo">DrugWeb Delivery 🚚</a>
+        <div class="nav-links">
+            <span style="margin-right: 15px; font-weight: bold; color: #555;">{{ deliveryman_info.F_name }}</span>
+            <a href="/deliveryman/dashboard">Dashboard</a>
+            <a href="/deliveryman/profile" style="color: #28a745;">My Profile</a>
+            <a href="/logout" style="color: #dc3545;">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div class="avatar"><i class="fas fa-truck"></i></div>
+            <h2>Delivery Partner Profile</h2>
+            
+            <div class="info-group">
+                <span class="label">Full Name</span>
+                <span class="value">{{ deliveryman_info.F_name }} {{ deliveryman_info.L_name }}</span>
+            </div>
+            
+            <div class="info-group">
+                <span class="label">Email Address</span>
+                <span class="value">{{ deliveryman_info.email }}</span>
+            </div>
+            
+            <div class="info-group">
+                <span class="label">Phone Number</span>
+                <span class="value">{{ deliveryman_info.phone }}</span>
+            </div>
+
+            <div class="info-group">
+                <span class="label">Delivery Man ID</span>
+                <span class="value" style="font-family: monospace; background: #eee; padding: 2px 6px; border-radius: 4px;">{{ deliveryman_info.DeliveryMan_ID }}</span>
+            </div>
+            
+            <a href="/deliveryman/dashboard" class="btn-back">Back to Dashboard</a>
+        </div>
+    </div>
+
+</body>
+</html>

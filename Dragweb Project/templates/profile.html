@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - DrugWeb</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; }
+        
+        /* Navbar */
+        .navbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .logo { color: #28a745; font-size: 24px; font-weight: bold; text-decoration: none; }
+        .nav-links a { margin-left: 20px; color: #555; text-decoration: none; font-weight: 500; }
+        .nav-links .btn-logout { color: #dc3545; }
+
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+
+        /* Left Column: Profile Card */
+        .profile-card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); text-align: center; }
+        .avatar { width: 100px; height: 100px; background: #e9ecef; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #adb5bd; }
+        .user-name { font-size: 1.5em; font-weight: bold; margin-bottom: 5px; color: #333; }
+        .user-role { color: #28a745; font-weight: 500; margin-bottom: 20px; display: inline-block; background: #e6ffed; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; }
+        
+        .points-box { background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); color: white; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .points-val { font-size: 2em; font-weight: bold; }
+        .points-label { font-size: 0.9em; opacity: 0.9; }
+
+        /* Right Column: Edit Form & Activity */
+        .content-area { display: flex; flex-direction: column; gap: 30px; }
+        
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
+        .card h3 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; color: #333; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        
+        label { display: block; margin-bottom: 8px; color: #666; font-size: 0.9em; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        input:focus, textarea:focus { border-color: #28a745; outline: none; }
+        
+        .btn-save { background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background 0.3s; }
+        .btn-save:hover { background: #218838; }
+
+        /* Recent Items List */
+        .activity-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .activity-item:last-child { border-bottom: none; }
+        .item-title { font-weight: 500; color: #333; }
+        .item-date { font-size: 0.85em; color: #888; }
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8em; font-weight: 500; }
+        .status-Pending { background: #fff3cd; color: #856404; }
+        .status-Accepted { background: #d4edda; color: #155724; }
+        .status-Declined { background: #f8d7da; color: #721c24; }
+
+        /* Alerts */
+        .alert-success { background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .alert-error { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/customer/dashboard" class="logo">DrugWeb 💊</a>
+        <div class="nav-links">
+            <a href="/customer/dashboard">Shop</a>
+            <a href="/customer/browse">Browse</a>
+            <a href="/customer/cart">Cart</a>
+            <a href="/customer/reviews">Reviews</a>
+            <a href="/customer/request_medicine">Request Med</a>
+            <a href="/customer/notifications">Notifications</a>
+            <a href="/customer/profile">My Profile</a>
+            <a href="/logout" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-card">
+            <div class="avatar"><i class="fas fa-user"></i></div>
+            <div class="user-name">{{ user_info.F_name }} {{ user_info.L_name }}</div>
+            <div class="user-role">Customer</div>
+            
+            <div class="points-box">
+                <div class="points-val">{{ customer_info.points or 0 }}</div>
+                <div class="points-label">Loyalty Points</div>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: left; font-size: 0.9em; color: #666;">
+                <p><i class="fas fa-envelope"></i> {{ user_info.email }}</p>
+                <p><i class="fas fa-phone"></i> {{ user_info.phone }}</p>
+                <p><i class="fas fa-map-marker-alt"></i> {{ user_info.address }}</p>
+            </div>
+        </div>
+
+        <div class="content-area">
+            
+            <div class="card">
+                <h3>Edit Profile Information</h3>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form action="/customer/profile" method="POST">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" name="f_name" value="{{ user_info.F_name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" name="l_name" value="{{ user_info.L_name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email" value="{{ user_info.email }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" name="phone" value="{{ user_info.phone }}" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Address</label>
+                            <textarea name="address" rows="2" required>{{ user_info.address }}</textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-save">Update Profile</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>Recent Medicine Requests</h3>
+                {% if recent_requests %}
+                    {% for req in recent_requests %}
+                    <div class="activity-item">
+                        <div>
+                            <div class="item-title">{{ req.request_med_name }}</div>
+                            <div class="item-date">Expected: {{ req.Expected_date }}</div>
+                        </div>
+                        <span class="status-badge status-{{ req.Status }}">{{ req.Status }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: #888; text-align: center;">No recent requests found.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

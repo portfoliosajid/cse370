@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
+        .card { background: white; max-width: 500px; margin: 50px auto; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .avatar { font-size: 60px; color: #333; margin-bottom: 20px; }
+        .info-row { text-align: left; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .label { font-weight: bold; color: #666; display: block; }
+        .btn { display: inline-block; padding: 10px 20px; background: #333; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="avatar"><i class="fas fa-user-shield"></i></div>
+        <h2>Admin Profile</h2>
+        <div class="info-row"><span class="label">Name:</span> {{ admin_info.F_name }} {{ admin_info.L_name }}</div>
+        <div class="info-row"><span class="label">Email:</span> {{ admin_info.email }}</div>
+        <div class="info-row"><span class="label">Phone:</span> {{ admin_info.phone }}</div>
+        <div class="info-row"><span class="label">ID:</span> {{ admin_info.Admin_ID }}</div>
+        <a href="/admin/dashboard" class="btn">Back to Dashboard</a>
+    </div>
+</body>
+</html>

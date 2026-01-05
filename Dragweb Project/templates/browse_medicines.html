@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Medicines - DrugWeb</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; }
+        .navbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .logo { color: #28a745; font-size: 24px; font-weight: bold; text-decoration: none; }
+        .nav-links a { margin-left: 20px; color: #555; text-decoration: none; font-weight: 500; }
+        
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; display: flex; gap: 30px; }
+        
+        /* Sidebar Filters */
+        .sidebar { width: 250px; flex-shrink: 0; }
+        .filter-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .filter-title { font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .category-link { display: block; padding: 8px 0; color: #666; text-decoration: none; transition: color 0.2s; }
+        .category-link:hover, .category-link.active { color: #28a745; font-weight: 500; }
+        
+        /* Main Content */
+        .main-content { flex-grow: 1; }
+        
+        .search-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-bar input { flex-grow: 1; padding: 12px; border: 1px solid #ddd; border-radius: 5px; }
+        .search-bar select { padding: 12px; border: 1px solid #ddd; border-radius: 5px; }
+        .btn-search { background: #28a745; color: white; border: none; padding: 0 25px; border-radius: 5px; cursor: pointer; }
+
+        .medicine-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .med-card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s; text-align: center; }
+        .med-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .med-name { font-weight: bold; margin: 10px 0 5px; }
+        .med-price { color: #28a745; font-weight: bold; font-size: 1.2em; margin-bottom: 10px; }
+        
+        .btn-add { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; width: 100%; }
+        .btn-add:hover { background: #218838; }
+
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 40px; }
+        .page-link { padding: 10px 15px; background: white; border: 1px solid #ddd; text-decoration: none; color: #333; border-radius: 5px; }
+        .page-link.active { background: #28a745; color: white; border-color: #28a745; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/customer/dashboard" class="logo">DrugWeb 💊</a>
+        <div class="nav-links">
+            <a href="/customer/dashboard">Shop</a>
+            <a href="/customer/browse">Browse</a>
+            <a href="/customer/cart">Cart</a>
+            <a href="/customer/reviews">Reviews</a>
+            <a href="/customer/request_medicine">Request Med</a>
+            <a href="/customer/notifications">Notifications</a>
+            <a href="/customer/profile">My Profile</a>
+            <a href="/logout" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="filter-card">
+                <div class="filter-title">Categories</div>
+                <a href="/customer/browse" class="category-link {% if not category %}active{% endif %}">All Medicines</a>
+                {% for cat in categories %}
+                <a href="/customer/browse?category={{ cat.Category }}" class="category-link {% if category == cat.Category %}active{% endif %}">
+                    {{ cat.Category }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="main-content">
+            <form action="/customer/browse" method="GET" class="search-bar">
+                <input type="text" name="search" placeholder="Search medicines..." value="{{ search }}">
+                <select name="sort_by">
+                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                    <option value="price" {% if sort_by == 'price' %}selected{% endif %}>Price (Low > High)</option>
+                    <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Price (High > Low)</option>
+                </select>
+                <button type="submit" class="btn-search">Search</button>
+            </form>
+
+            <div class="medicine-grid">
+                {% for med in medicines %}
+                <div class="med-card">
+                    <div style="font-size: 0.8em; color: #888;">{{ med.Category }}</div>
+                    <div class="med-name">{{ med.Name }}</div>
+                    <div style="font-style: italic; color: #666; font-size: 0.9em; margin-bottom: 10px;">{{ med.Generic_name }}</div>
+                    <div class="med-price">৳{{ med.Price }}</div>
+                    <button onclick="addToCart('{{ med.Med_Code }}', '{{ med.Name }}', {{ med.Price }})" class="btn-add">
+                        Add to Cart
+                    </button>
+                </div>
+                {% else %}
+                <p>No medicines found.</p>
+                {% endfor %}
+            </div>
+
+            {% if total_pages > 1 %}
+            <div class="pagination">
+                {% if has_prev %}
+                <a href="{{ url_for('customer.browse_medicines', page=page-1, search=search, category=category, sort_by=sort_by) }}" class="page-link">&laquo; Prev</a>
+                {% endif %}
+                
+                <span class="page-link active">{{ page }}</span>
+                
+                {% if has_next %}
+                <a href="{{ url_for('customer.browse_medicines', page=page+1, search=search, category=category, sort_by=sort_by) }}" class="page-link">Next &raquo;</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function addToCart(code, name, price) {
+            fetch('/customer/add_to_cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ med_code: code, med_name: name, quantity: 1, price: price })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    if (confirm("✅ " + name + " added to cart!\nGo to Cart now?")) {
+                        window.location.href = "/customer/cart";
+                    }
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

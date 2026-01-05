@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Dashboard - DrugWeb</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; }
+        
+        .navbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .logo { color: #28a745; font-size: 24px; font-weight: bold; text-decoration: none; }
+        .nav-links a { margin-left: 20px; color: #555; text-decoration: none; }
+        
+        .container { max-width: 1000px; margin: 30px auto; padding: 20px; }
+        
+        .order-card { background: white; border-radius: 10px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 5px solid #007bff; }
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .order-id { font-weight: bold; font-size: 1.1em; color: #333; }
+        .order-date { color: #888; font-size: 0.9em; }
+        
+        .customer-info { margin-bottom: 20px; }
+        .info-row { display: flex; margin-bottom: 5px; }
+        .info-label { width: 100px; color: #666; font-weight: 500; }
+        .info-val { color: #333; }
+        
+        .action-area { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: 500; }
+        .btn-accept { background: #28a745; }
+        .btn-decline { background: #dc3545; }
+        .btn-deliver { background: #17a2b8; width: 100%; margin-top: 10px; }
+        .btn:hover { opacity: 0.9; }
+        
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.85em; font-weight: bold; }
+        .status-Assigned { background: #cfe2ff; color: #084298; }
+        .status-Accepted { background: #d1e7dd; color: #0f5132; }
+        .status-Delivered { background: #28a745; color: white; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/deliveryman/dashboard" class="logo">DrugWeb Delivery 🚚</a>
+        <div class="nav-links">
+            <span style="margin-right: 15px; font-weight: bold; color: #555;">Welcome, {{ session.user_name }}</span>
+            <a href="/deliveryman/dashboard">Dashboard</a>
+            <a href="/deliveryman/profile">My Profile</a>
+            <a href="/logout" style="color: #dc3545;">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>📦 Your Delivery Assignments</h2>
+        
+        {% for order in assigned_payments %}
+        <div class="order-card" id="card-{{ order.Payment_ID }}" 
+             style="border-left-color: {% if order.Status == 'Delivered' %}#28a745{% else %}#007bff{% endif %};">
+            
+            <div class="order-header">
+                <span class="order-id">Order #{{ order.Payment_ID }}</span>
+                <span class="status-badge status-{{ order.Status.split(' ')[0] }}">{{ order.Status }}</span>
+            </div>
+            
+            <div class="customer-info">
+                <div class="info-row">
+                    <span class="info-label">Customer:</span>
+                    <span class="info-val">{{ order.Customer_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Phone:</span>
+                    <span class="info-val">{{ order.Customer_phone }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Address:</span>
+                    <span class="info-val">{{ order.Customer_address }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Amount:</span>
+                    <span class="info-val" style="font-weight: bold; color: #28a745;">৳{{ order.Total_Amount }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Payment:</span>
+                    <span class="info-val">{{ order.payment_type }}</span>
+                </div>
+            </div>
+
+            {% if 'Accepted' not in order.Status and 'Delivered' not in order.Status %}
+                <div class="action-area" id="actions-{{ order.Payment_ID }}">
+                    <input type="date" id="date-{{ order.Payment_ID }}" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                    <button onclick="handleDelivery('{{ order.Payment_ID }}', 'accept')" class="btn btn-accept">Accept Order</button>
+                    <button onclick="handleDelivery('{{ order.Payment_ID }}', 'decline')" class="btn btn-decline">Decline</button>
+                </div>
+
+            {% elif 'Accepted' in order.Status %}
+                <div style="color: #0f5132; font-weight: bold; padding: 10px; background: #d1e7dd; border-radius: 5px;">
+                    <i class="fas fa-clock"></i> Delivery scheduled for {{ order.delivery_date }}
+                </div>
+                <button onclick="handleDelivery('{{ order.Payment_ID }}', 'delivered')" class="btn btn-deliver">
+                    <i class="fas fa-box-open"></i> Mark as Delivered
+                </button>
+
+            {% elif 'Delivered' in order.Status %}
+                <div style="color: white; font-weight: bold; padding: 10px; background: #28a745; border-radius: 5px; text-align: center;">
+                    <i class="fas fa-check-circle"></i> Successfully Delivered
+                </div>
+            {% endif %}
+            
+        </div>
+        {% else %}
+        <div style="text-align: center; color: #666; padding: 50px;">
+            <h3>No orders assigned yet!</h3>
+            <p>Wait for the admin to assign you new deliveries.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        function handleDelivery(paymentId, action) {
+            let deliveryDate = null;
+            
+            if (action === 'accept') {
+                const dateInput = document.getElementById('date-' + paymentId);
+                if (!dateInput.value) {
+                    alert('Please select a delivery date first!');
+                    return;
+                }
+                deliveryDate = dateInput.value;
+            }
+
+            let confirmMsg = "Are you sure you want to " + action + " this order?";
+            if (action === 'delivered') confirmMsg = "Confirm that order #" + paymentId + " has been delivered?";
+
+            if(!confirm(confirmMsg)) return;
+
+            fetch('/deliveryman/handle_delivery', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    payment_id: paymentId, 
+                    action: action,
+                    delivery_date: deliveryDate
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if(data.success) location.reload();
+            });
+        }
+    </script>
+</body>
+</html>
